@@ -1,12 +1,94 @@
 # LInOG InSAR Processing Manual
-## ALOS-1 PALSAR FBS Stack Processing
-### ISCE2 + MintPy Automated Pipeline
-**Version 2.2 — parameterized for reusable Path/Frame runs**
 
-National Institute of Geological Sciences  
-University of the Philippines Diliman  
-*DOST-PCIEERD LInOG Project*  
-April 2026
+ALOS-1 PALSAR FBS stack processing workflow using **ISCE2 + MintPy**, designed for:
+
+- **LOCAL** runs for setup, learning, and interferogram visualization
+- **FELIX** runs for production-scale processing
+- reusable **Path/Frame variables** for repeatable workflows
+- audited scripts with documented fixes and assumptions
+
+**Current manual version:** 2.2  
+**Repository:** `Ayiemeyzing/LInOG_InSAR_Processing`
+
+---
+
+## Repository Contents
+
+- `README.md` — full end-to-end processing manual
+- `ERRATA.md` — preserved audit history, bug findings, corrections, and environment assumptions
+- `CHANGELOG.md` — repository and manual version history
+- `scripts/check_preflight.sh` — local environment verification script
+- `scripts/linog_save_insar_images.py` — exports interferogram phase and combined images
+- `scripts/linog_create_grid.py` — builds interferogram report pages
+- `scripts/linog_gen_interactive_kmz.py` — generates interactive KMZ outputs
+- `scripts/linog_fbs_processor.sh` — master automation script for the processing workflow
+
+---
+
+## Intended Users
+
+This repository is for **users** working with the LInOG ALOS-1 PALSAR FBS processing workflow, including:
+
+- users learning the workflow locally
+- users processing production runs on felix
+- users maintaining or validating the scripts
+- users reviewing known assumptions, caveats, and corrections
+
+No prior InSAR experience is assumed, but users should be comfortable following Linux command-line instructions carefully and exactly.
+
+---
+
+## Processing Environments
+
+```text
+LOCAL (your laptop)      → setup, learning, visualization, small test runs
+FELIX (NIGS server)      → production runs, full-frame processing
+```
+
+Where commands differ, this manual marks them as `[LOCAL]` or `[FELIX]`.
+
+---
+
+## Quick Start
+
+1. Complete **Section 1: Pre-Flight**
+2. Install **ISCE2 + MintPy** in **Section 2**
+3. Define your frame variables in **Section 3.4**
+4. Initialize your workspace in **Phase 0**
+5. Run the processing phases in order
+6. Review `ERRATA.md` before production use
+
+---
+
+## Reusable Run Variables
+
+This manual is parameterized so users only define the Path and Frame once per run.
+
+Example:
+
+```bash
+export PATH_NUM=448
+export FRAME_NUM=0290
+
+export PADDED_PATH=p${PATH_NUM}
+export PADDED_FRAME=f${FRAME_NUM}
+export FRAME_TAG=P${PATH_NUM}F${FRAME_NUM}
+```
+
+This produces:
+
+- `p448`
+- `f0290`
+- `P448F0290`
+
+These variables are reused throughout the workflow to reduce editing and minimize path mistakes.
+
+---
+
+## Audit and Version Tracking
+
+- See `ERRATA.md` for bug findings, fixes, audit history, and environment assumptions
+- See `CHANGELOG.md` for version-by-version repository and documentation updates
 
 ---
 
@@ -31,7 +113,6 @@ April 2026
 - [16. Troubleshooting: Pre-Flight and Installation](#16-troubleshooting-pre-flight-and-installation)
 - [17. Troubleshooting: Processing Pipeline](#17-troubleshooting-processing-pipeline)
 - [18. Scientific References](#18-scientific-references)
-
 ---
 
 ## 0. Read This First — Tutorial Roadmap
