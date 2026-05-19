@@ -1,26 +1,27 @@
 # ERRATA — LInOG InSAR Processing Manual
 
-**Document:** `README.md`  
-**Manual version:** 2.2  
 **Repository:** `Ayiemeyzing/LInOG_InSAR_Processing`  
-**Audited:** 2026-05-19  
-**Status:** Critical script issues identified, corrected, and documented. README updated to use reusable Path/Frame variables and user-oriented wording.
+**Current manual file:** `README.md`  
+**Current manual version:** 2.2  
+**Audit history preserved:** Yes  
+**Last updated:** 2026-05-19
 
 ---
 
-## 1. Summary
+## 1. Current Status
 
-This repository contains:
+This repository now contains:
 
-- a revised and parameterized `README.md`
-- corrected operational scripts under `scripts/`
-- documented assumptions for felix/NIGS-specific infrastructure
-- cross-check notes between the manual and the uploaded scripts
+- a revised `README.md` based on the original manual
+- corrected scripts under `scripts/`
+- preserved audit history from the earlier v2.1 review
+- updated documentation for reusable Path/Frame processing
 
-The manual was updated to:
-
-- use **users** instead of **students**
-- support reusable run variables:
+### Current state summary
+- Critical script bugs found in the original audit: **fixed**
+- Minor script bugs found in the original audit: **fixed**
+- README wording updated from **students** to **users**
+- README updated to support reusable variables:
   - `PATH_NUM`
   - `FRAME_NUM`
   - `PADDED_PATH`
@@ -28,129 +29,97 @@ The manual was updated to:
   - `FRAME_TAG`
   - `BASE_DIR`
   - `WORK_DIR`
-- reduce hardcoded frame-specific commands in the workflow
-- preserve frame-specific examples only where needed
 
 ---
 
-## 2. Critical Bugs Fixed
+## 2. Active Corrections Reflected in This Repository
 
-| ID | Severity | File | Issue | Resolution |
-|----|----------|------|-------|------------|
-| B1 | Critical | `scripts/linog_save_insar_images.py` | `mag_norm[p_high == p_low] = 0` used a scalar boolean as an array index and could raise `IndexError` | Replaced with an early return when `p_high == p_low` |
-| B2 | Critical | `scripts/linog_fbs_processor.sh` | `mintpy.load.metaFile = .../reference/IW1.xml` was Sentinel-1 TOPS-specific and invalid for ALOS stripmap processing | Replaced with `reference/*.xml` wildcard |
-| B3 | Critical | `scripts/linog_fbs_processor.sh` | MintPy config used `filt_fine.unw`, `filt_fine.cor`, and `filt_fine.unw.conncomp`, which are topsStack naming conventions rather than stripmapStack date-pair naming | Replaced with wildcard stripmap-compatible patterns: `filt_*.unw`, `filt_*.cor`, `filt_*.unw.conncomp` |
-| B4 | Critical | `scripts/linog_fbs_processor.sh` | Phase 4.5 printed incorrect script names (`save_insar_images.py`, `create_grid.py`) instead of repository filenames with the `linog_` prefix | Replaced with `linog_save_insar_images.py` and `linog_create_grid.py` |
+These fixes are already reflected in the current repository files.
 
----
-
-## 3. Minor Bugs Fixed
-
-| ID | Severity | File | Issue | Resolution |
-|----|----------|------|-------|------------|
-| B5 | Minor | `scripts/linog_save_insar_images.py` | Usage string printed `save_insar_images.py` instead of the real filename | Updated usage string to `linog_save_insar_images.py` |
-| B6 | Minor | `scripts/linog_gen_interactive_kmz.py` | `matplotlib.pyplot` was imported inside a repeatedly called helper function | Moved import to module scope |
-| B7 | Minor | `scripts/linog_gen_interactive_kmz.py` | Used deprecated `plt.cm.jet` access pattern | Replaced with `matplotlib.colormaps['jet']` |
+| ID | Severity | File | Issue | Current Resolution |
+|----|----------|------|-------|--------------------|
+| B1 | Critical | `scripts/linog_save_insar_images.py` | Scalar boolean used as array index in `stretch_magnitude()` could raise `IndexError` | Fixed with early return when `p_high == p_low` |
+| B2 | Critical | `scripts/linog_fbs_processor.sh` | `mintpy.load.metaFile = .../reference/IW1.xml` was Sentinel-1/TOPS-specific and invalid for ALOS stripmap processing | Replaced with `reference/*.xml` |
+| B3 | Critical | `scripts/linog_fbs_processor.sh` | MintPy config used `filt_fine.*` naming conventions inconsistent with stripmapStack date-pair outputs | Replaced with `filt_*.unw`, `filt_*.cor`, and `filt_*.unw.conncomp` |
+| B4 | Critical | `scripts/linog_fbs_processor.sh` | Phase 4.5 displayed wrong script names without the `linog_` prefix | Corrected printed commands |
+| B5 | Minor | `scripts/linog_save_insar_images.py` | Usage string referenced wrong filename | Corrected |
+| B6 | Minor | `scripts/linog_gen_interactive_kmz.py` | `matplotlib.pyplot` imported inside repeatedly used helper | Moved to module scope |
+| B7 | Minor | `scripts/linog_gen_interactive_kmz.py` | Deprecated `plt.cm.jet` usage | Replaced with `matplotlib.colormaps['jet']` |
 
 ---
 
-## 4. README v2.2 Improvements
+## 3. README v2.2 Documentation Changes
 
-These are documentation improvements rather than bug fixes.
+These are documentation improvements added after the original v2.1 audit.
 
-| ID | Type | Area | Improvement |
-|----|------|------|-------------|
-| D1 | Documentation | Global wording | Replaced **students** with **users** throughout the manual |
-| D2 | Documentation | Run configuration | Added reusable variables for Path/Frame runs |
-| D3 | Documentation | Phase 0 onward | Converted hardcoded `p448/f0310` style examples into variable-based commands where appropriate |
-| D4 | Documentation | Local and felix flow | Clarified variable setup for both `[LOCAL]` and `[FELIX]` environments |
-| D5 | Documentation | Output naming | Standardized references to `${FRAME_TAG}` and related run variables |
-
----
-
-## 5. Manual ↔ Script Cross-Check
-
-### 5.1 Confirmed Consistent
-
-| Area | Result |
-|------|--------|
-| `linog_create_grid.py` usage in manual | Consistent |
-| `linog_gen_interactive_kmz.py --correction demErr / demErr_ramp` | Consistent |
-| Deliverable naming in Phase 6 and Section 15 | Consistent with script output naming |
-| `CORRECTION_MAP` file mapping in KMZ script | Consistent with documented MintPy outputs |
-| `linog_` script naming convention | Now consistent across manual and scripts |
-
-### 5.2 Noted Operational Distinctions
-
-| Area | Note |
-|------|------|
-| Reference date `20091111` | Valid as a known good example for specific frames such as 0310, but must be reviewed per frame |
-| `linog_save_insar_images.py` | Operates on `.int` files in the current directory, so it does not directly need Path/Frame arguments |
-| `linog_create_grid.py` and `linog_gen_interactive_kmz.py` | Correctly support `--path` and `--frame` arguments |
+| ID | Type | Area | Change |
+|----|------|------|--------|
+| D1 | Documentation | Global wording | Replaced **students** with **users** |
+| D2 | Documentation | Run configuration | Added reusable run variables for Path/Frame processing |
+| D3 | Documentation | Workflow steps | Replaced many hardcoded frame references with `${PATH_NUM}`, `${FRAME_NUM}`, `${FRAME_TAG}`, and `${WORK_DIR}` |
+| D4 | Documentation | Environment setup | Clarified both `[LOCAL]` and `[FELIX]` variable setup |
+| D5 | Documentation | Naming consistency | Standardized use of `linog_` script names and `${FRAME_TAG}` output references |
 
 ---
 
-## 6. Verified Correct Items
+## 4. Confirmed Correct Items
 
-The following items were reviewed and did **not** require code changes:
+The following were reviewed and did not require code changes:
 
 - `scripts/linog_create_grid.py` page layout logic
-- `scripts/linog_create_grid.py` date extraction and image pairing behavior
+- `scripts/linog_create_grid.py` date extraction and pairing behavior
 - `scripts/linog_gen_interactive_kmz.py` `CORRECTION_MAP`
 - `scripts/linog_fbs_processor.sh` Phase 6 suffix logic for `demErr` and `demErr_ramp`
-- MintPy `view.py`, `save_gdal.py`, and `save_kmz.py` command usage
-- `stackStripMap.py` parameter pattern for FBS stripmap processing
+- MintPy CLI usage for `view.py`, `save_gdal.py`, and `save_kmz.py`
+- `stackStripMap.py` flag pattern for FBS stripmap processing
 - use of `geo_timeseries_ramp_demErr.h5` for `demErr_ramp`
-- Python 3.12 pinning in the environment setup for conda-forge ISCE2
+- Python 3.12 pinning for conda-forge ISCE2
 
 ---
 
-## 7. External Dependency / Platform Warnings
+## 5. External Dependency and Platform Warnings
 
-These are not direct script bugs, but users should be aware of them.
+These are not repository code bugs, but users should be aware of them.
 
 | ID | Area | Warning |
 |----|------|---------|
-| W1 | DEM download | `http://step.esa.int/auxdata/dem/SRTMGL1/` may experience intermittent downtime |
+| W1 | DEM download | `http://step.esa.int/auxdata/dem/SRTMGL1/` may have intermittent downtime |
 | W2 | Apple Silicon | ISCE2 is not officially distributed for `osx-arm64` via conda-forge |
-| W3 | Conda solving | Some environments may solve slowly; `mamba` may be needed |
-| W4 | Google Charts in KMZ | Interactive chart behavior depends on Google Earth and external chart loader support |
+| W3 | Conda solving | Some systems may need `mamba` due to slow solver performance |
+| W4 | Interactive KMZ | Google Charts behavior depends on Google Earth support for embedded HTML/JS and remote assets |
 
 ---
 
-## 8. Felix / Infrastructure Assumptions
+## 6. Felix / Infrastructure Assumptions
 
-These steps are intentionally preserved but should be verified in the actual environment.
+These steps are environment-specific and should be verified on the actual deployment.
 
 | ID | Area | Assumption |
 |----|------|------------|
-| F1 | Server paths | `/eggraid/...` is specific to felix/NIGS storage layout |
-| F2 | Internal utilities | `find_alos.sh` is locally maintained and not publicly verifiable here |
-| F3 | Internal utilities | `run_unpack_all_cli.py` is locally maintained and not publicly verifiable here |
-| F4 | Internal utilities | `poststep04_cleanup.py` is locally maintained and not publicly verifiable here |
-| F5 | Shared tool location | `/eggraid/sbin` contents may differ across deployments |
-| F6 | Reference metadata contents | Exact files under `reference/*.xml` may vary by processor version and product type |
+| F1 | Storage layout | `/eggraid/...` paths are specific to felix/NIGS |
+| F2 | Internal utility | `find_alos.sh` is internal and not publicly verifiable here |
+| F3 | Internal utility | `run_unpack_all_cli.py` is internal and not publicly verifiable here |
+| F4 | Internal utility | `poststep04_cleanup.py` is internal and not publicly verifiable here |
+| F5 | Shared scripts | `/eggraid/sbin` contents may vary by deployment |
+| F6 | Reference metadata | Exact files matched by `reference/*.xml` may vary by processor version |
 
 ---
 
-## 9. Recommended User Checks Before Running
+## 7. Recommended Checks Before Running a New Frame
 
 Before processing a new frame, users should verify:
 
-1. `PATH_NUM` is exactly 3 digits
-2. `FRAME_NUM` is exactly 4 digits
-3. `BASE_DIR` matches the actual environment:
-   - felix: `/eggraid/home/$USER/projects/linog/insar`
-   - local: `$HOME/LInOG/insar`
-4. `load_isce` correctly activates the expected environment
-5. `reference/*.xml` and interferogram outputs match the processor’s actual generated filenames
-6. the delivery folder name matches `${FRAME_TAG}` exactly
+1. `PATH_NUM` is exactly **3 digits**
+2. `FRAME_NUM` is exactly **4 digits**
+3. `BASE_DIR` matches the real environment
+4. `load_isce` activates the expected conda environment
+5. `reference/*.xml` exists after stack preparation
+6. interferogram outputs follow the expected naming
+7. delivery folder names match `${FRAME_TAG}` exactly
 
 ---
 
-## 10. Current Repository Layout
-
-Expected structure:
+## 8. Current Repository Layout
 
 ```text
 LInOG_InSAR_Processing/
@@ -166,17 +135,104 @@ LInOG_InSAR_Processing/
 
 ---
 
-## 11. Final Status
+## 9. Audit History
+
+This section preserves both the original and updated audit records.
+
+---
+
+## Audit A — Original Cross-Audit of Manual v2.1 and Scripts
+
+**Document audited:** `LInOG_InSAR_Processing_Manual_v2.1.md`  
+**Audit type:** Initial cross-analysis of manual ↔ uploaded scripts  
+**Status at time of audit:** Issues identified before repository correction
+
+### A.1 Critical Bugs Found
+
+| ID | Severity | File | Original Finding |
+|----|----------|------|------------------|
+| B1 | Critical | `linog_save_insar_images.py` | `mag_norm[p_high == p_low] = 0` used a scalar bool as an array index and could raise `IndexError` |
+| B2 | Critical | `linog_fbs_processor.sh` | `mintpy.load.metaFile = .../reference/IW1.xml` was Sentinel-1/TOPS-specific and not appropriate for ALOS stripmap |
+| B3 | Critical | `linog_fbs_processor.sh` | `filt_fine.unw`, `filt_fine.cor`, `filt_fine.unw.conncomp` matched topsStack naming, not stripmapStack date-pair naming |
+| B4 | Critical | `linog_fbs_processor.sh` | Phase 4.5 printed `save_insar_images.py` and `create_grid.py` without `linog_` prefix |
+
+### A.2 Minor Bugs Found
+
+| ID | Severity | File | Original Finding |
+|----|----------|------|------------------|
+| B5 | Minor | `linog_save_insar_images.py` | Usage message used wrong script filename |
+| B6 | Minor | `linog_gen_interactive_kmz.py` | `matplotlib.pyplot` imported inside helper function repeatedly |
+| B7 | Minor | `linog_gen_interactive_kmz.py` | Used deprecated `plt.cm.jet` access |
+
+### A.3 Manual ↔ Script Discrepancies Found
+
+| ID | Area | Finding |
+|----|------|---------|
+| D-OLD-1 | Phase 4.5 manual vs script echo block | Manual correctly used `linog_` filenames, while the shell script did not |
+| D-OLD-2 | MintPy outputs | `geo_timeseries_ramp_demErr.h5` mapping for `demErr_ramp` was confirmed correct |
+| D-OLD-3 | Deliverables naming | Phase 6 output naming was confirmed consistent |
+
+### A.4 Initial Felix Assumptions Flagged
+
+| ID | Area | Finding |
+|----|------|---------|
+| F-OLD-1 | Server paths | `/eggraid/...` was assumed environment-specific |
+| F-OLD-2 | Internal tools | `find_alos.sh`, `run_unpack_all_cli.py`, and `poststep04_cleanup.py` could not be externally verified |
+| F-OLD-3 | Reference date | `20091111` was only known-good for specific frames and not universally guaranteed |
+
+### A.5 Initial External Warnings
+
+| ID | Area | Finding |
+|----|------|---------|
+| W-OLD-1 | DEM source | ESA STEP auxiliary DEM URL may be unreliable at times |
+| W-OLD-2 | Python version concern | Earlier concern about Python 3.12 support was later retracted after verification |
+
+### A.6 Items Originally Verified Correct
+
+- `linog_create_grid.py` logic
+- KMZ correction mapping
+- deliverable suffix logic
+- MintPy command usage
+- stripmapStack parameter pattern
+- dual use of `los.rdr` for angular data
+- interactive KMZ timeseries indexing
+
+---
+
+## Audit B — README v2.2 Parameterization and Repository-State Update
+
+**Document audited:** `README.md`  
+**Audit type:** Repository-state update after fixes and documentation rewrite  
+**Status:** Current
+
+### B.1 Documentation Updates Introduced
+
+- manual wording changed from **students** to **users**
+- workflow rewritten to support reusable Path/Frame variables
+- commands updated to reduce hardcoded frame references
+- local and felix setup clarified using variable blocks
+
+### B.2 Repository-State Conclusions
+
+- All critical issues from Audit A are fixed in the committed scripts
+- All minor issues from Audit A are fixed in the committed scripts
+- Remaining caveats are operational or environment-specific, not repository code defects
+
+---
+
+## 10. Final Status
 
 ### Code status
 - Critical issues: **fixed**
 - Minor issues: **fixed**
-- Remaining concerns: environment-specific verification only
 
 ### Documentation status
-- README updated to version **2.2**
-- manual now supports reusable Path/Frame configuration
-- wording updated from **students** to **users**
+- current manual version: **2.2**
+- audit history preserved: **yes**
+- reusable Path/Frame workflow: **yes**
+
+### Remaining limitations
+- server-specific items still require verification in the real felix environment
 
 ---
 
